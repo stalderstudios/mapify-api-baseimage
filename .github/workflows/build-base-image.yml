@@ -8,6 +8,8 @@ on:
       - 'Dockerfile'  # Only trigger if the Dockerfile is changed
       - '.github/workflows/*.yml'  # Also trigger if this workflow file changes
 
+permissions: write-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
