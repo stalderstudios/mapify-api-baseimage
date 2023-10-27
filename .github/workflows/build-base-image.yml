@@ -29,5 +29,5 @@ jobs:
         context: . # Build context is the root directory of the repo
         push: true
         tags: |
-          ghcr.io/stalderstudios/mapify-api-base:latest
-          ghcr.io/stalderstudios/mapify-api-base:${{github.sha}}
+          ghcr.io/stalderstudios/mapify-api-baseimage:latest
+          ghcr.io/stalderstudios/mapify-api-baseimage:${{github.sha}}
