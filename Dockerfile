@@ -7,4 +7,5 @@ RUN install-php-extensions \
     opcache \
     xsl \
     gd \
-    exif
+    exif \
+    intl
