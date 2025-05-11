@@ -3,6 +3,7 @@ name: Build and Push Base Image
 on:
   schedule:
     - cron: '0 0 */14 * *'  # Runs every 14 days
+  workflow_dispatch:  # Allows manual triggering from the Actions tab
   push:
     branches:
       - main  # Trigger the workflow on push to the main branch
