@@ -15,15 +15,25 @@ permissions: write-all
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          # Two separate native builds instead of one multi-platform build - QEMU emulation for
+          # the non-native leg was both slow (~27min) and has been flaky for FrankenPHP specifically
+          # in the past. GitHub's arm64-hosted runners (free on public repos) let both architectures
+          # build natively, so each image only ever runs on the hardware it was actually built for.
+          - runner: ubuntu-latest
+            arch: amd64
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-    
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -39,12 +49,12 @@ jobs:
         echo "BUILD_DATE=$(date +'%Y%m%d')" >> "$GITHUB_ENV"
         echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c 1-7)" >> "$GITHUB_ENV"
 
-    - name: Build and Push Docker image
+    - name: Build and Push Docker image (native ${{ matrix.arch }}, no emulation)
       uses: docker/build-push-action@v5
       with:
         context: .
-        platforms: linux/amd64,linux/arm64
+        platforms: ${{ matrix.platform }}
         push: true
         tags: |
-          ghcr.io/stalderstudios/mapify-api-baseimage:latest
-          ghcr.io/stalderstudios/mapify-api-baseimage:${{env.BUILD_DATE}}-${{env.SHORT_SHA}}
+          ghcr.io/stalderstudios/mapify-api-baseimage:${{ matrix.arch }}-latest
+          ghcr.io/stalderstudios/mapify-api-baseimage:${{ matrix.arch }}-${{ env.BUILD_DATE }}-${{ env.SHORT_SHA }}
