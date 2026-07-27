@@ -44,10 +44,11 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Get the date and commit hash
+    - name: Get the date, commit hash, and PHP version
       run: |
         echo "BUILD_DATE=$(date +'%Y%m%d')" >> "$GITHUB_ENV"
         echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c 1-7)" >> "$GITHUB_ENV"
+        echo "PHP_VERSION=$(grep -oP '(?<=dunglas/frankenphp:php)[0-9.]+' Dockerfile)" >> "$GITHUB_ENV"
 
     - name: Build and Push Docker image (native ${{ matrix.arch }}, no emulation)
       uses: docker/build-push-action@v7
@@ -57,4 +58,5 @@ jobs:
         push: true
         tags: |
           ghcr.io/stalderstudios/mapify-api-baseimage:${{ matrix.arch }}-latest
-          ghcr.io/stalderstudios/mapify-api-baseimage:${{ matrix.arch }}-${{ env.BUILD_DATE }}-${{ env.SHORT_SHA }}
+          ghcr.io/stalderstudios/mapify-api-baseimage:${{ matrix.arch }}-php${{ env.PHP_VERSION }}
+          ghcr.io/stalderstudios/mapify-api-baseimage:${{ matrix.arch }}-php${{ env.PHP_VERSION }}-${{ env.BUILD_DATE }}-${{ env.SHORT_SHA }}
